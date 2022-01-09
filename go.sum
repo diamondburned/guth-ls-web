@@ -3,8 +3,8 @@ github.com/blang/vfs v1.0.0/go.mod h1:jjuNUc/IKcRNNWC9NUCvz4fR9PZLPIKxEygtPs/4tS
 github.com/daaku/go.zipexe v1.0.1/go.mod h1:5xWogtqlYnfBXkSB1o9xysukNP9GTvaNkqzUZbt3Bw8=
 github.com/diamondburned/listener v0.0.0-20201025235325-c458deda1495 h1:GeSRg9dpv5iVVShljyfhG9SzHj2WpuYJ9+XsP+GPAmQ=
 github.com/diamondburned/listener v0.0.0-20201025235325-c458deda1495/go.mod h1:p3edGGNNb3kpayx5Klx2BSptqMmmEElX6BobXnkOZvU=
-github.com/diamondburned/tmplutil v0.0.0-20210405231014-0aed68593326 h1:fHzM5Jr9i4A5IPs2VtPOcszFdKaOJt9CxPbt8ZcrcbM=
-github.com/diamondburned/tmplutil v0.0.0-20210405231014-0aed68593326/go.mod h1:FBAqurv13gfYH+o5XicjpFgmFPXiqWh52nWY8k5XNt0=
+github.com/diamondburned/tmplutil v0.0.0-20220109065244-7ae8b7fad5dd h1:EfdWdMLR6gQsfATxVfGcO2aXwZRybz5R7h3+v+Yj6+I=
+github.com/diamondburned/tmplutil v0.0.0-20220109065244-7ae8b7fad5dd/go.mod h1:FBAqurv13gfYH+o5XicjpFgmFPXiqWh52nWY8k5XNt0=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/go-sql-driver/mysql v1.6.0 h1:BCTh4TKNUYmOmMUcQ3IipzF5prigylS7XXjEkfCHuOE=
 github.com/go-sql-driver/mysql v1.6.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=

@@ -2,6 +2,7 @@ package frontend
 
 import (
 	"embed"
+	"os"
 
 	"github.com/diamondburned/tmplutil"
 )
@@ -10,7 +11,7 @@ import (
 var webFS embed.FS
 
 var Templater = tmplutil.Templater{
-	FileSystem: webFS,
+	FileSystem: tmplutil.OverrideFS(webFS, os.DirFS(".")),
 	Includes: map[string]string{
 		"css":    "components/css.html",
 		"header": "components/header.html",
