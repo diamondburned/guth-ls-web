@@ -1,0 +1,6 @@
+github.com/diamondburned/listener v0.0.0-20201025235325-c458deda1495 h1:GeSRg9dpv5iVVShljyfhG9SzHj2WpuYJ9+XsP+GPAmQ=
+github.com/diamondburned/listener v0.0.0-20201025235325-c458deda1495/go.mod h1:p3edGGNNb3kpayx5Klx2BSptqMmmEElX6BobXnkOZvU=
+github.com/go-sql-driver/mysql v1.6.0 h1:BCTh4TKNUYmOmMUcQ3IipzF5prigylS7XXjEkfCHuOE=
+github.com/go-sql-driver/mysql v1.6.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
+github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
+github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
