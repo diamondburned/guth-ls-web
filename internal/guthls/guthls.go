@@ -1,9 +1,32 @@
 package guthls
 
-import "time"
+import (
+	"fmt"
+	"time"
+
+	"github.com/leighmacdonald/steamid/steamid"
+)
 
 // Leaderboard describes a leaderboard.
 type Leaderboard []UserLeaderboard
+
+// LeaderboardQueryFlags contains flags for querying additional information from
+// the database along with the leaderboard.
+type LeaderboardQueryFlags uint8
+
+const (
+	LeaderboardQueryUser LeaderboardQueryFlags = 1 << iota
+	LeaderboardQueryRank
+)
+
+// NewLeaderboardQueryFlags ORs the flags together.
+func NewLeaderboardQueryFlags(flags []LeaderboardQueryFlags) LeaderboardQueryFlags {
+	var flag LeaderboardQueryFlags
+	for _, f := range flags {
+		flag |= f
+	}
+	return flag
+}
 
 // UserLeaderboard describes a player in the leaderboard (or a row in the
 // guth-ls table).
@@ -11,9 +34,9 @@ type UserLeaderboard struct {
 	SteamID SteamID
 	XP      int
 	Level   int
-	// User is the optional field to be fetched if Provider.Leaderboard is given
-	// fetchUser = true.
-	User *User
+
+	User *User  // only if LeaderboardQueryUser
+	Rank string // only if LeaderboardQueryRank
 }
 
 // UserTimes contains multiple users.
@@ -30,6 +53,16 @@ type User struct {
 
 // SteamID is a player's Steam ID.
 type SteamID string
+
+// ProfileURL returns the profile URL for the Steam ID. If the SteamID is
+// invalid, then an empty string is returned.
+func (id SteamID) ProfileURL() string {
+	s := steamid.SIDToSID64(steamid.SID(id))
+	if s == 0 {
+		return ""
+	}
+	return fmt.Sprintf("https://steamcommunity.com/profiles/%d", s)
+}
 
 // Seconds is a number type that represents a second duration.
 type Seconds int
@@ -54,9 +87,9 @@ type Provider interface {
 	// Users gets all users.
 	Users() ([]User, error)
 	// LeaderboardForUser gets the user's leaderboard entry by Steam ID.
-	LeaderboardForUser(id SteamID, fetchUser bool) (*UserLeaderboard, error)
+	LeaderboardForUser(SteamID, ...LeaderboardQueryFlags) (*UserLeaderboard, error)
 	// Leaderboard gets the entire leaderboard. The returned leaderboard is
 	// guaranteed to be sorted by Level then XP. If fetchUser is true, then the
 	// returned UserLeaderboard instances should have the User field filled.
-	Leaderboard(fetchUser bool) (Leaderboard, error)
+	Leaderboard(...LeaderboardQueryFlags) (Leaderboard, error)
 }

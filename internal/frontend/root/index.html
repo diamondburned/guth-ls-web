@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+{{ template "css" . }}
+{{ template "header" . }}
+
+<title>Garry's Mod Leaderboard</title>
+
+<table id="leaderboard">
+	<caption>Leaderboard</caption>
+	<thead>
+		<tr>
+			<th>Player Name</th>
+			<th>Level × XP</th>
+			<th>Total Time</th>
+			<th>Last Played</th>
+		</tr>
+	</thead>
+	<tbody>
+		{{ range .Prov.Leaderboard QueryUser QueryRank }}
+		<tr>
+			<td data-label="Player Name">
+				<a href="{{ .SteamID.ProfileURL }}">
+					{{ .User.PlayerName }}
+					{{ with .Rank }}<mark data-rank="{{ . }}">{{ . }}</mark>{{ end }}
+				</a>
+			</td>
+			<td data-label="Level × XP">
+				{{ .Level }} × {{ .XP }}
+			</td>
+			<td data-label="Total Time">
+				{{ with .User.TotalTime.Duration }}
+				<span title="{{ .String }}">{{ RelDuration . }}</span>
+				{{ end }}
+			</td>
+			<td data-label="Last Visit">
+				{{ with .User.LastVisit.Time }}
+				<time datetime="{{ .Format RFC3339 }}" title="{{ .Format "02/01/2006 15:04 MST" }}">{{ RelTime . }}</time>
+				{{ end }}
+			</td>
+		</tr>
+		{{ end }}
+	</tbody>
+</table>
+
+{{ template "footer" . }}

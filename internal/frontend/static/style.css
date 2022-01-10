@@ -1,0 +1,16 @@
+div.row[aria-label="Error"] {
+	justify-content: center;
+}
+
+div.card.error pre {
+	margin: var(--universal-margin) auto;
+	white-space: pre-wrap;
+}
+
+div.card.error pre code {
+	padding: 0;
+}
+
+table#leaderboard {
+	max-height: none;
+}

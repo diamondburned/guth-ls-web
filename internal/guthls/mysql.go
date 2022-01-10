@@ -6,6 +6,7 @@ import (
 	"database/sql"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/keegancsmith/sqlf"
 	"github.com/pkg/errors"
 )
 
@@ -61,13 +62,12 @@ func (p *MySQLProvider) Users() ([]User, error) {
 }
 
 // LeaderboardForUser implements Provider.
-func (p *MySQLProvider) LeaderboardForUser(steamID SteamID, fetchUser bool) (*UserLeaderboard, error) {
-	f, q := lbQueryChoose(fetchUser)
+func (p *MySQLProvider) LeaderboardForUser(steamID SteamID, f ...LeaderboardQueryFlags) (*UserLeaderboard, error) {
+	query, scan := leaderboardQuery(f, sqlf.Sprintf("guth_ls.SteamID = %s", steamID))
 
-	row := p.DB.QueryRow(
-		q+" WHERE guth_ls.SteamID = ? ORDER BY guth_ls.LVL DESC, guth_ls.XP DESC", steamID)
+	row := p.DB.QueryRow(query.Query(sqlf.SimpleBindVar), query.Args()...)
 
-	l, err := f(row.Scan)
+	l, err := scan(row.Scan)
 	if err != nil {
 		return nil, err
 	}
@@ -76,11 +76,10 @@ func (p *MySQLProvider) LeaderboardForUser(steamID SteamID, fetchUser bool) (*Us
 }
 
 // Leaderboard implements Provider.
-func (p *MySQLProvider) Leaderboard(fetchUser bool) (Leaderboard, error) {
-	f, q := lbQueryChoose(fetchUser)
+func (p *MySQLProvider) Leaderboard(f ...LeaderboardQueryFlags) (Leaderboard, error) {
+	query, scan := leaderboardQuery(f)
 
-	rows, err := p.DB.Query(
-		q + " ORDER BY guth_ls.LVL DESC, guth_ls.XP DESC")
+	rows, err := p.DB.Query(query.Query(sqlf.SimpleBindVar), query.Args()...)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +87,7 @@ func (p *MySQLProvider) Leaderboard(fetchUser bool) (Leaderboard, error) {
 
 	var lb Leaderboard
 	for rows.Next() {
-		u, err := f(rows.Scan)
+		u, err := scan(rows.Scan)
 		if err != nil {
 			return nil, err
 		}
@@ -98,29 +97,11 @@ func (p *MySQLProvider) Leaderboard(fetchUser bool) (Leaderboard, error) {
 	return lb, rows.Err()
 }
 
-func lbQueryChoose(fetchUser bool) (func(scanFunc) (UserLeaderboard, error), string) {
-	if fetchUser {
-		return scanUserLeaderboardFetch, lbFetchQuery
-	}
-	return scanUserLeaderboard, lbQuery
-}
-
 type scanFunc func(...interface{}) error
 
-const (
-	userQuery = "" +
-		"SELECT utime.steamid, utime.playername, utime.team, utime.totaltime, utime.lastvisit " +
-		"FROM utime"
-
-	lbQuery = "" +
-		"SELECT guth_ls.SteamID, guth_ls.XP, guth_ls.LVL " +
-		"FROM guth_ls"
-
-	lbFetchQuery = "" +
-		"SELECT guth_ls.SteamID, guth_ls.XP, guth_ls.LVL, utime.playername, utime.team, utime.totaltime, utime.lastvisit " +
-		"FROM guth_ls " +
-		"INNER JOIN utime ON utime.steamid = guth_ls.SteamID"
-)
+const userQuery = "" +
+	"SELECT utime.steamid, utime.playername, utime.team, utime.totaltime, utime.lastvisit " +
+	"FROM utime"
 
 func scanUser(scan scanFunc) (User, error) {
 	var u User
@@ -128,20 +109,52 @@ func scanUser(scan scanFunc) (User, error) {
 	return u, newScanError(err, "user")
 }
 
-func scanUserLeaderboard(scan scanFunc) (UserLeaderboard, error) {
-	var l UserLeaderboard
-	err := scan(&l.SteamID, &l.XP, &l.Level)
-	return l, newScanError(err, "leaderboard")
-}
+type leaderboardScanner = func(scanFunc) (UserLeaderboard, error)
 
-func scanUserLeaderboardFetch(scan scanFunc) (UserLeaderboard, error) {
-	var l UserLeaderboard
-	l.User = &User{}
-	err := scan(
-		&l.SteamID, &l.XP, &l.Level,
-		&l.User.PlayerName, &l.User.Team, &l.User.TotalTime, &l.User.LastVisit)
-	l.User.SteamID = l.SteamID
-	return l, err
+func leaderboardQuery(flags []LeaderboardQueryFlags, filters ...*sqlf.Query) (*sqlf.Query, leaderboardScanner) {
+	head := sqlf.Sprintf("guth_ls.SteamID, guth_ls.XP, guth_ls.LVL")
+	join := &sqlf.Query{}
+
+	flag := NewLeaderboardQueryFlags(flags)
+	if flag&LeaderboardQueryUser != 0 {
+		head = sqlf.Sprintf("%s, utime.playername, utime.team, utime.totaltime, utime.lastvisit", head)
+		join = sqlf.Sprintf("%s INNER JOIN utime ON utime.steamid = guth_ls.SteamID", join)
+	}
+	if flag&LeaderboardQueryRank != 0 {
+		head = sqlf.Sprintf("%s, ranks.rank", head)
+		join = sqlf.Sprintf("%s LEFT JOIN ranks ON ranks.steamid = guth_ls.SteamID", join)
+	}
+
+	head = sqlf.Sprintf("SELECT %s FROM guth_ls %s", head, join)
+	if len(filters) > 0 {
+		head = sqlf.Sprintf("%s WHERE %s", head, sqlf.Join(filters, "AND"))
+	}
+	head = sqlf.Sprintf("%s ORDER BY guth_ls.LVL DESC, guth_ls.XP DESC", head)
+
+	return head, func(scan scanFunc) (l UserLeaderboard, err error) {
+		v := []interface{}{&l.SteamID, &l.XP, &l.Level}
+
+		if flag&LeaderboardQueryUser != 0 {
+			l.User = &User{}
+			v = append(v, &l.User.PlayerName, &l.User.Team, &l.User.TotalTime, &l.User.LastVisit)
+
+			defer func() {
+				l.User.SteamID = l.SteamID
+			}()
+		}
+
+		if flag&LeaderboardQueryRank != 0 {
+			var rank sql.NullString
+			v = append(v, &rank)
+
+			defer func() {
+				l.Rank = rank.String
+			}()
+		}
+
+		err = newScanError(scan(v...), "leaderboard")
+		return
+	}
 }
 
 func newScanError(err error, thing string) error {
