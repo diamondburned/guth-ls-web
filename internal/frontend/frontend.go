@@ -11,7 +11,6 @@ import (
 	"github.com/diamondburned/tmplutil"
 	"github.com/dustin/go-humanize"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 )
 
 //go:embed *
@@ -47,7 +46,6 @@ var Templater = tmplutil.Templater{
 func MountStatic() http.Handler {
 	mux := chi.NewMux()
 	mux.Use(staticCache)
-	mux.Use(middleware.Compress(5))
 	mux.Handle("/static*", http.FileServer(http.FS(webFS)))
 	return mux
 }
