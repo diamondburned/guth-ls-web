@@ -13,4 +13,6 @@ div.card.error pre code {
 
 table#leaderboard {
 	max-height: none;
+	max-width:  1000px;
+	margin: auto;
 }
