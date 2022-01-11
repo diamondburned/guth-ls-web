@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/diamondburned/guth-ls-web/internal/duration"
 	"github.com/diamondburned/tmplutil"
 	"github.com/dustin/go-humanize"
 	"github.com/go-chi/chi/v5"
@@ -17,7 +18,7 @@ import (
 var webFS embed.FS
 
 var Templater = tmplutil.Templater{
-	FileSystem: tmplutil.OverrideFS(webFS, os.DirFS(".")),
+	FileSystem: tmplutil.OverrideFS(webFS, os.DirFS("frontend")),
 	Includes: map[string]string{
 		"css":    "components/css.html",
 		"error":  "components/error.html",
@@ -31,9 +32,11 @@ var Templater = tmplutil.Templater{
 		"RelTime": func(t time.Time) string {
 			return humanize.Time(t)
 		},
-		"RelDuration": func(d time.Duration) string {
-			now := time.Unix(0, 0)
-			return humanize.RelTime(now.Add(d), now, "", "")
+		"RelDurationShort": func(d time.Duration) string {
+			return duration.Short(d)
+		},
+		"RelDurationLong": func(d time.Duration) string {
+			return duration.Long(d)
 		},
 	},
 	OnRenderFail: func(sub *tmplutil.Subtemplate, w io.Writer, err error) {

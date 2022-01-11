@@ -61,6 +61,16 @@ func (p *MySQLProvider) Users() ([]User, error) {
 	return users, rows.Err()
 }
 
+// GlobalStats implements Provider.
+func (p *MySQLProvider) GlobalStats() (*GlobalStats, error) {
+	var stats GlobalStats
+
+	row := p.DB.QueryRow("SELECT COUNT(player), SUM(totaltime) FROM utime_server")
+	err := row.Scan(&stats.Players, &stats.TotalTime)
+
+	return &stats, err
+}
+
 // LeaderboardForUser implements Provider.
 func (p *MySQLProvider) LeaderboardForUser(steamID SteamID, f ...LeaderboardQueryFlags) (*UserLeaderboard, error) {
 	query, scan := leaderboardQuery(f, sqlf.Sprintf("guth_ls.SteamID = %s", steamID))

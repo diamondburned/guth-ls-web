@@ -80,6 +80,12 @@ func (t UnixTime) Time() time.Time {
 	return time.Unix(int64(t), 0)
 }
 
+// GlobalStats is the global statistics of the server.
+type GlobalStats struct {
+	Players   int
+	TotalTime Seconds
+}
+
 // Provider describes the database getters.
 type Provider interface {
 	// User gets a user by Steam ID.
@@ -92,4 +98,6 @@ type Provider interface {
 	// guaranteed to be sorted by Level then XP. If fetchUser is true, then the
 	// returned UserLeaderboard instances should have the User field filled.
 	Leaderboard(...LeaderboardQueryFlags) (Leaderboard, error)
+	// GlobalStats gets the global server statistics.
+	GlobalStats() (*GlobalStats, error)
 }

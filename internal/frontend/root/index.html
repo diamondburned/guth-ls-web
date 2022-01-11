@@ -4,8 +4,30 @@
 
 <title>Garry's Mod Leaderboard</title>
 
+<h2>Statistics</h2>
+
+<div id="global-stats" class="row">
+	{{ with .Prov.GlobalStats }}
+	<div class="card">
+		<div class="section">
+			<h4>Players Served</h4>
+			<p>{{ if eq .Players 1 }}1 player{{ else }}{{ .Players }} players{{ end }}</p>
+		</div>
+	</div>
+	<div class="card">
+		<div class="section">
+			<h4>Total Playtime</h4>
+			<p>{{ RelDurationLong .TotalTime.Duration }}</p>
+		</div>
+	</div>
+	{{ end }}
+</div>
+
+<hr />
+
+<h2>Leaderboard</h2>
+
 <table id="leaderboard">
-	<caption>Leaderboard</caption>
 	<thead>
 		<tr>
 			<th>Player Name</th>
@@ -28,7 +50,7 @@
 			</td>
 			<td data-label="Total Time">
 				{{ with .User.TotalTime.Duration }}
-				<span title="{{ .String }}">{{ RelDuration . }}</span>
+				<span title="{{ .String }}">{{ RelDurationShort . }}</span>
 				{{ end }}
 			</td>
 			<td data-label="Last Visit">
