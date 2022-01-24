@@ -44,8 +44,8 @@ github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZm
 github.com/dgryski/go-sip13 v0.0.0-20181026042036-e10d5fee7954/go.mod h1:vAd38F8PWV+bWy6jNmig1y/TA+kYO4g3RSRF0IAv0no=
 github.com/diamondburned/listener v0.0.0-20201025235325-c458deda1495 h1:GeSRg9dpv5iVVShljyfhG9SzHj2WpuYJ9+XsP+GPAmQ=
 github.com/diamondburned/listener v0.0.0-20201025235325-c458deda1495/go.mod h1:p3edGGNNb3kpayx5Klx2BSptqMmmEElX6BobXnkOZvU=
-github.com/diamondburned/tmplutil v0.0.0-20220110011032-808886d32a50 h1:pFoO578sIXbi/qcARtrNtHknOxi+3TnIlc/MDPKLrkE=
-github.com/diamondburned/tmplutil v0.0.0-20220110011032-808886d32a50/go.mod h1:FBAqurv13gfYH+o5XicjpFgmFPXiqWh52nWY8k5XNt0=
+github.com/diamondburned/tmplutil v0.0.0-20220124221250-5dbe568d9e70 h1:I2It/Pbts1xbG64GpJc81VccBpNPUElovz8Zddko0fk=
+github.com/diamondburned/tmplutil v0.0.0-20220124221250-5dbe568d9e70/go.mod h1:FBAqurv13gfYH+o5XicjpFgmFPXiqWh52nWY8k5XNt0=
 github.com/dustin/go-humanize v1.0.0 h1:VSnTsYCnlFHaM2/igO1h6X3HA71jcobQuxemgkq4zYo=
 github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
